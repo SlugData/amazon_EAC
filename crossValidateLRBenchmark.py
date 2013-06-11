@@ -1,8 +1,7 @@
-from sklearn.ensemble import *
-from sklearn import cross_validation
+from sklearn import *
+from sklearn.linear_model import *
 import pandas as pd
 import numpy as np
-from sklearn import metrics
 
 def main():
     # read in data, parse into training and target sets
@@ -10,12 +9,17 @@ def main():
     target = dataset.ACTION.values
     train = dataset.drop('ACTION', axis=1).drop('ROLE_CODE', axis=1).values
 
-    # Use random forest classifier
-    cfr = RandomForestClassifier(n_estimators=100)
-    #cfr = GradientBoostingClassifier(n_estimators=1000, subsample = 0.1)
+    # OneHotEncoding
+    enc = preprocessing.OneHotEncoder()
+    enc.fit(train)
+    train = enc.transform(train)
+
+    # Use Linear model classifier (Logistic Regression)
+    cfr = LogisticRegression()
 
     # Simple KFold cross validation. 10 folds.
-    cv = cross_validation.KFold(len(train), n_folds=10, indices=False)
+    #cv = cross_validation.KFold(len(train), n_folds=10, indices=False)
+    cv = cross_validation.KFold(train.shape[0], n_folds=10, indices=True)
 
     # iterate through the training and test cross validation segments and
     # run the classifier on each one, aggregating the results into a list
@@ -27,7 +31,9 @@ def main():
         auc = metrics.auc(fpr, tpr)
         results.append(auc)
 
-    print "Results: " + str( np.array(results).mean() )
+    for r in results:
+        print "Result: " + str(r)
+    print "Average Result: " + str( np.array(results).mean() )
 
 if __name__=="__main__":
     main()
