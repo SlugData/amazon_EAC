@@ -9,23 +9,18 @@ def main():
     target = dataset.ACTION.values
     train = dataset.drop('ACTION', axis=1).drop('ROLE_CODE', axis=1).values
 
-    # OneHotEncoding
-    enc = preprocessing.OneHotEncoder()
-    enc.fit(train)
-    train = enc.transform(train)
-
     # Use Linear model classifier (Logistic Regression)
     cfr = LogisticRegression()
 
     # Simple KFold cross validation. 10 folds.
-    #cv = cross_validation.KFold(len(train), n_folds=10, indices=False)
-    cv = cross_validation.KFold(train.shape[0], n_folds=10, indices=True)
+    cv = cross_validation.KFold(len(train), n_folds=10, indices=False)
+    #cv = cross_validation.KFold(train.shape[0], n_folds=10, indices=True)
 
     # iterate through the training and test cross validation segments and
     # run the classifier on each one, aggregating the results into a list
     results = []
     for traincv, testcv in cv:
-        predictions = cfr.fit(train[traincv], target[traincv]).predict(train[testcv])
+        predictions = cfr.fit(train[traincv], target[traincv]).predict_proba(train[testcv])[:,1]
         true_labels = target[testcv]
         fpr, tpr, thresholds = metrics.roc_curve(true_labels, predictions, pos_label = 1)
         auc = metrics.auc(fpr, tpr)
