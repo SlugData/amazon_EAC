@@ -21,7 +21,7 @@ def main():
     # run the classifier on each one, aggregating the results into a list
     results = []
     for traincv, testcv in cv:
-        predictions = cfr.fit(train[traincv], target[traincv]).predict(train[testcv])
+        predictions = cfr.fit(train[traincv], target[traincv]).predict_proba(train[testcv])[:,1]
         true_labels = target[testcv]
         fpr, tpr, thresholds = metrics.roc_curve(true_labels, predictions, pos_label = 1)
         auc = metrics.auc(fpr, tpr)
