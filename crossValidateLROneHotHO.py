@@ -16,7 +16,7 @@ def main():
 
     # Hyperparameter Optimization via GridSearch
     lrc = LogisticRegression()
-    parameters = { 'penalty':['l2'], 'C':[1.0, 3.0], 'fit_intercept':[True,False]}
+    parameters = { 'penalty':['l2'],'dual':[True,False], 'C':[1.0, 3.0, 5.0], 'fit_intercept':[True,False]}
     cfr = grid_search.GridSearchCV(lrc, parameters, score_func = metrics.auc_score, cv=None)
 
     # Use Linear model classifier (Logistic Regression)
